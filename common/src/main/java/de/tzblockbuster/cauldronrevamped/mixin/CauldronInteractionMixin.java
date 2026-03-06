@@ -98,28 +98,27 @@ public interface CauldronInteractionMixin {
                     }
                     return InteractionResult.SUCCESS;
                 } else {
+                    level.setBlockAndUpdate(blockPos, CRBlocks.BREWING_CAULDRON.defaultBlockState());
+
+                    BrewingCauldronBlockEntity brewingCauldronBlockEntity = (BrewingCauldronBlockEntity) level.getBlockEntity(blockPos);
+                    if (brewingCauldronBlockEntity == null) return InteractionResult.TRY_WITH_EMPTY_HAND;
+                    if (!brewingCauldronBlockEntity.addPotion(itemStack)) return InteractionResult.TRY_WITH_EMPTY_HAND;
+
                     if (!level.isClientSide()) {
                         Item item = itemStack.getItem();
-                        ItemStack copy = itemStack.copy();
                         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
                         player.awardStat(Stats.USE_CAULDRON);
                         player.awardStat(Stats.ITEM_USED.get(item));
                         level.setBlockAndUpdate(blockPos, CRBlocks.BREWING_CAULDRON.defaultBlockState());
                         level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                         level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
-
-                        BrewingCauldronBlockEntity brewingCauldronBlockEntity = (BrewingCauldronBlockEntity) level.getBlockEntity(blockPos);
-                        if (brewingCauldronBlockEntity == null) return InteractionResult.TRY_WITH_EMPTY_HAND;
-                        if (!brewingCauldronBlockEntity.addPotion(copy)) return InteractionResult.TRY_WITH_EMPTY_HAND;
-
-                        return InteractionResult.SUCCESS;
                     }
+
+                    return InteractionResult.SUCCESS;
                 }
             } else {
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
             }
-
-            return InteractionResult.PASS;
         });
     }
 

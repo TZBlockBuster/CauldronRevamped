@@ -3,5 +3,6 @@
   "item.cauldronrevamped.lava_bottle": "Lava Bottle",
   "item.cauldronrevamped.honey_bucket": "Honey Bucket",
   "item.cauldronrevamped.slime_bucket": "Slime Bucket",
-  "item.cauldronrevamped.slime_bottle": "Slime Bottle"
+  "item.cauldronrevamped.slime_bottle": "Slime Bottle",
+  "itemGroup.cauldronrevamped": "Cauldron Revamped"
 }

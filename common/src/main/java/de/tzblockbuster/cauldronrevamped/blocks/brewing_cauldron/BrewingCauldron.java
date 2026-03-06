@@ -21,6 +21,8 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -119,5 +121,14 @@ public class BrewingCauldron extends AbstractCauldronBlock implements EntityBloc
         BlockState blockState2 = i == 0 ? Blocks.CAULDRON.defaultBlockState() : blockState.setValue(LayeredCauldronBlock.LEVEL, i);
         level.setBlockAndUpdate(blockPos, blockState2);
         level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(blockState2));
+    }
+
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
+        return (level1, blockPos1, blockState1, blockEntity1) -> {
+            if (blockEntity1 instanceof BrewingCauldronBlockEntity brewingCauldronBlockEntity) {
+                brewingCauldronBlockEntity.tick();
+            }
+        };
     }
 }

@@ -1,14 +1,12 @@
 package de.tzblockbuster.cauldronrevamped.neoforge.registry;
 
 import de.tzblockbuster.cauldronrevamped.CauldronRevamped;
-import de.tzblockbuster.cauldronrevamped.registry.CRBlockEntities;
-import de.tzblockbuster.cauldronrevamped.registry.CRBlocks;
-import de.tzblockbuster.cauldronrevamped.registry.CRItems;
-import de.tzblockbuster.cauldronrevamped.registry.CRPotion;
+import de.tzblockbuster.cauldronrevamped.registry.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.level.block.Block;
@@ -53,6 +51,18 @@ public class CauldronRevampedRegistry {
                 Identifier id = Identifier.fromNamespaceAndPath(CauldronRevamped.MOD_ID, potion.getA());
                 registry.register(id, potion.getB());
                 potion.getC().accept(BuiltInRegistries.POTION.wrapAsHolder(potion.getB()));
+            }
+        });
+        event.register(BuiltInRegistries.CREATIVE_MODE_TAB.key(), registry -> {
+            for (Tuple<String, CRCreativeTab.CreativeTab> tab : CRCreativeTab.creativeTabs) {
+                Identifier id = Identifier.fromNamespaceAndPath(CauldronRevamped.MOD_ID, tab.getA());
+                CreativeModeTab creativeModeTab = CreativeModeTab.builder()
+                        .icon(() -> tab.getB().icon())
+                        .title(tab.getB().title())
+                        .displayItems((parameters, output) -> {
+                            output.acceptAll(tab.getB().displayedItems());
+                        }).build();
+                registry.register(id, creativeModeTab);
             }
         });
     }

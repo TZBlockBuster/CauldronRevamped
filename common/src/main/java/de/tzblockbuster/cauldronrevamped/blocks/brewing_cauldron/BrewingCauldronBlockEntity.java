@@ -2,10 +2,13 @@ package de.tzblockbuster.cauldronrevamped.blocks.brewing_cauldron;
 
 import de.tzblockbuster.cauldronrevamped.registry.CRBlockEntities;
 import de.tzblockbuster.cauldronrevamped.registry.CRPotion;
+import dev.architectury.platform.Platform;
+import dev.architectury.utils.Env;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -16,6 +19,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
@@ -36,6 +40,9 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
 
     public BrewingCauldronBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(CRBlockEntities.brewingCauldronBlockEntity.get(), blockPos, blockState);
+        if(Platform.getEnvironment() == Env.CLIENT) {
+            currentLevel = blockState.getValue(LayeredCauldronBlock.LEVEL);
+        }
     }
 
     @Override
@@ -127,26 +134,57 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
 
     public PotionContents createPotionContents(ArrayList<MobEffectInstance> effects) {
         if (effects.isEmpty()) return new PotionContents(Potions.MUNDANE);
-
-        return new PotionContents(Optional.of(CRPotion.MIXED_POTION), Optional.of(getColor()), effects, Optional.empty());
+        List<Potion> potions = BuiltInRegistries.POTION.stream().toList();
+        for (Potion potion : potions) {
+            if (potion.getEffects().size() == effects.size()) {
+                boolean matches = true;
+                for (int i = 0; i < effects.size(); i++) {
+                    MobEffectInstance effect1 = potion.getEffects().get(i);
+                    MobEffectInstance effect2 = effects.get(i);
+                    if (effect1.getEffect() != effect2.getEffect() || effect1.getAmplifier() != effect2.getAmplifier() || Math.abs(effect1.getDuration() - effect2.getDuration()) > 20) {
+                        matches = false;
+                        break;
+                    }
+                }
+                if (matches) {
+                    return new PotionContents(BuiltInRegistries.POTION.wrapAsHolder(potion));
+                }
+            }
+        }
+        return new PotionContents(Optional.of(CRPotion.MIXED_POTION), Optional.of(getColor(effects)), effects, Optional.empty());
     }
 
-    public int getColor() {
-        if (effects.isEmpty()) return 0x0000ff;
-        List<Integer> colors = new ArrayList<>();
-        for (MobEffectInstance effect : effects) {
+    public int getColor(ArrayList<MobEffectInstance> effectInstances) {
+        if (effectInstances.isEmpty()) return 0x0000ff;
+        List<ColorMix> colors = new ArrayList<>();
+        int totalDuration = effectInstances.stream().mapToInt(MobEffectInstance::getDuration).sum();
+        for (MobEffectInstance effect : effectInstances) {
             if (effect.getEffect().unwrapKey().isPresent()) {
                 Optional<Holder.Reference<MobEffect>> mobEffect = BuiltInRegistries.MOB_EFFECT.get(effect.getEffect().unwrapKey().get());
-                mobEffect.ifPresent(mobEffectReference -> colors.add(mobEffectReference.value().getColor()));
+                mobEffect.ifPresent(mobEffectReference -> {
+                    int r = (mobEffectReference.value().getColor() >> 16) & 0xFF;
+                    int g = (mobEffectReference.value().getColor() >> 8) & 0xFF;
+                    int b = mobEffectReference.value().getColor() & 0xFF;
+                    colors.add(new ColorMix(r, g, b, (float) effect.getDuration() / (float) totalDuration));
+                });
             }
         }
         if (colors.isEmpty()) return 0x0000ff;
-        return (int) colors.stream().mapToInt(Integer::intValue).average().orElse(colors.getFirst());
+        float r = 0, g = 0, b = 0;
+        for (ColorMix color : colors) {
+            r += (int) (color.r * color.ratio);
+            g += (int) (color.g * color.ratio);
+            b += (int) (color.b * color.ratio);
+        }
+
+        return (int) (r) << 16 | (int) (g) << 8 | (int) (b);
+    }
+
+    record ColorMix(int r, int g, int b, float ratio) {
     }
 
     public void updateBlock() {
         if (getLevel() == null) return;
-        getLevel().setBlockAndUpdate(getBlockPos(), getBlockState());
 
         if (getLevel().getBlockState(getBlockPos().below()).is(BlockTags.CAMPFIRES)) {
             getLevel().setBlockAndUpdate(getBlockPos(), getBlockState().setValue(BrewingCauldron.HEATED, true));
@@ -156,4 +194,39 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
     }
 
 
+    private float currentLevel = 0;
+
+    private static final float ANIMATION_SPEED = 1f / 5f;
+
+    public float getFluidAnimationLevel(float partialTicks) {
+        if (Platform.getEnvironment() == Env.CLIENT) {
+            if (getLevel() == null) return 0;
+            int level = getBlockState().getValue(LayeredCauldronBlock.LEVEL);
+            int direction = currentLevel < level ? 1 : currentLevel > level ? -1 : 0;
+            return currentLevel + (direction * ANIMATION_SPEED) * partialTicks;
+        } else {
+            return 0;
+        }
+    }
+
+    public void tick() {
+        if (getLevel() == null) return;
+        if (Platform.getEnvironment() == Env.SERVER) {
+            int level = getBlockState().getValue(LayeredCauldronBlock.LEVEL);
+            if (getBlockState().getValue(BrewingCauldron.HEATED)) {
+                if (getLevel().random.nextInt(20) == 0) {
+                    getLevel().addParticle(ParticleTypes.BUBBLE_COLUMN_UP, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.6 + level * 3f, getBlockPos().getZ() + 0.5, 0, 0.1, 0);
+                }
+            }
+        } else if (Platform.getEnvironment() == Env.CLIENT) {
+            if (getLevel() != null) {
+                int level = getBlockState().getValue(LayeredCauldronBlock.LEVEL);
+                int direction = currentLevel < level ? 1 : currentLevel > level ? -1 : 0;
+                currentLevel += direction * ANIMATION_SPEED;
+                if (Math.abs(currentLevel - level) < ANIMATION_SPEED) {
+                    currentLevel = level;
+                }
+            }
+        }
+    }
 }
