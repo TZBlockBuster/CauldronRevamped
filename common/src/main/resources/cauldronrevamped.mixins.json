@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "package": "de.tzblockbuster.cauldronrevamped.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+  ],
+  "mixins": [
+    "BlocksMixin",
+    "BottleItemMixin",
+    "CauldronInteractionMixin",
+    "DispenseItemBehaviorMixin",
+    "HoneyBlockMixin",
+    "LayeredCauldronBlockMixin",
+    "SlimeBlockMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
