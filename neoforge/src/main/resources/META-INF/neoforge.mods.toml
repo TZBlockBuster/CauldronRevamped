@@ -1,17 +1,17 @@
 modLoader = "javafml"
 loaderVersion = "[2,)"
-#issueTrackerURL = ""
+issueTrackerURL = "https://github.com/TZBlockBuster/CauldronRevamped/issues"
 license = "MIT"
 
 [[mods]]
 modId = "cauldronrevamped"
 version = "${version}"
 displayName = "CauldronRevamped"
-authors = ""
+authors = "TZBlockBuster"
 description = '''
-
+CauldronRevamped reworks the vanilla cauldron, while keeping it as vanilla as possible. It adds the ability to mix potions inside the cauldron.
 '''
-#logoFile = ""
+logoFile = "src/main/resources/assets/cauldronrevamped/icon.png"
 
 [[dependencies.cauldronrevamped]]
 modId = "neoforge"

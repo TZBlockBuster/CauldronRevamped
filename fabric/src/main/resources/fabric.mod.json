@@ -3,12 +3,13 @@
   "id": "cauldronrevamped",
   "version": "${version}",
   "name": "CauldronRevamped",
-  "description": "",
+  "description": "CauldronRevamped reworks the vanilla cauldron, while keeping it as vanilla as possible. It adds the ability to mix potions inside the cauldron.",
   "authors": [
-    ""
+    "TZBlockBuster"
   ],
   "contact": {
-    "homepage": ""
+    "sources": "https://github.com/TZBlockBuster/CauldronRevamped",
+    "issues": "https://github.com/TZBlockBuster/CauldronRevamped/issues"
   },
   "license": "MIT",
   "icon": "assets/cauldronrevamped/icon.png",
