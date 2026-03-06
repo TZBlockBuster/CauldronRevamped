@@ -27,7 +27,6 @@ configurations {
 fabricApi {
     configureDataGeneration() {
         outputDirectory = file("../common/src/main/generated/resources")
-        outputDirectory = file("../neoforge/src/main/resources")
         client = true
     }
 }
