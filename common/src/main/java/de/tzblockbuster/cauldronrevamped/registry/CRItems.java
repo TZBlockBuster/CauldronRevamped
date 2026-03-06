@@ -1,7 +1,6 @@
 package de.tzblockbuster.cauldronrevamped.registry;
 
 import de.tzblockbuster.cauldronrevamped.CauldronRevamped;
-import dev.architectury.platform.Platform;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -44,12 +43,7 @@ public class CRItems {
 
     private static Item registerItem(String name, Function<Item.Properties, Item> itemFunction, Item.Properties properties) {
         Identifier identifier = Identifier.fromNamespaceAndPath(CauldronRevamped.MOD_ID, name);
-        Item item;
-        if (Platform.isFabric()) {
-            item = itemFunction.apply(properties.useItemDescriptionPrefix().setId(ResourceKey.create(Registries.ITEM, identifier)));
-        } else {
-            item = itemFunction.apply(properties);
-        }
+        Item item = itemFunction.apply(properties.useItemDescriptionPrefix().setId(ResourceKey.create(Registries.ITEM, identifier)));
         items.add(new Tuple<>(name, item));
         return item;
     }

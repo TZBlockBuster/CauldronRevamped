@@ -11,7 +11,7 @@ public class CauldronRevampedEntityRendererRegistry {
     @SubscribeEvent
     public void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         for(CRBlockEntityRenderer.BlockEntityRendererEntry blockEntityRenderer : CRBlockEntityRenderer.BLOCK_ENTITY_RENDERERS) {
-            event.registerBlockEntityRenderer((BlockEntityType<? extends BlockEntity>) blockEntityRenderer.blockEntity(), context -> blockEntityRenderer.blockEntityRenderer().create(context));
+            event.registerBlockEntityRenderer((BlockEntityType<? extends BlockEntity>) blockEntityRenderer.blockEntity().get(), context -> blockEntityRenderer.blockEntityRenderer().create(context));
         }
     }
 }

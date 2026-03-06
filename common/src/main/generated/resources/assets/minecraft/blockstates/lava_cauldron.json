@@ -1,0 +1,28 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "minecraft:block/lava_cauldron_full"
+      },
+      "when": {
+        "level": "3"
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/lava_cauldronlevel_2"
+      },
+      "when": {
+        "level": "2"
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/lava_cauldron_level1"
+      },
+      "when": {
+        "level": "1"
+      }
+    }
+  ]
+}

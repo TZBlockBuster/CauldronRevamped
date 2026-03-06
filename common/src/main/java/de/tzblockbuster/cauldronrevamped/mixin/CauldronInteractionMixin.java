@@ -123,45 +123,11 @@ public interface CauldronInteractionMixin {
         });
     }
 
-    @Unique
-    private static InteractionResult cauldronrevamped$fillSlimeInteraction(
-            BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, ItemStack itemStack
-    ) {
-        return isUnderWater(level, blockPos)
-                ? InteractionResult.CONSUME
-                : emptyBucket(
-                level,
-                blockPos,
-                player,
-                interactionHand,
-                itemStack,
-                CRBlocks.SLIME_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3),
-                SoundEvents.BUCKET_EMPTY_POWDER_SNOW
-        );
-    }
-
-    @Unique
-    private static InteractionResult cauldronrevamped$fillHoneyInteraction(
-            BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, ItemStack itemStack
-    ) {
-        return isUnderWater(level, blockPos)
-                ? InteractionResult.CONSUME
-                : emptyBucket(
-                level,
-                blockPos,
-                player,
-                interactionHand,
-                itemStack,
-                CRBlocks.HONEY_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3),
-                SoundEvents.BUCKET_EMPTY_POWDER_SNOW
-        );
-    }
-
     @PlatformOnly({PlatformOnly.FABRIC})
     @Inject(method = "addDefaultInteractions", at = @At("TAIL"))
     private static void cauldronrevamped$addDefaultInteractions(Map<Item, CauldronInteraction> map, CallbackInfo ci) {
-        map.put(CRItems.SLIME_BUCKET, CauldronInteractionMixin::cauldronrevamped$fillSlimeInteraction);
-        map.put(CRItems.HONEY_BUCKET, CauldronInteractionMixin::cauldronrevamped$fillHoneyInteraction);
+        map.put(CRItems.SLIME_BUCKET, CauldronRevampedInteraction::fillSlimeInteraction);
+        map.put(CRItems.HONEY_BUCKET, CauldronRevampedInteraction::fillHoneyInteraction);
     }
 
 }

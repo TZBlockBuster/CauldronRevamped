@@ -9,7 +9,6 @@
     "BlocksMixin",
     "BottleItemMixin",
     "CauldronInteractionMixin",
-    "DispenseItemBehaviorMixin",
     "HoneyBlockMixin",
     "LayeredCauldronBlockMixin",
     "SlimeBlockMixin"

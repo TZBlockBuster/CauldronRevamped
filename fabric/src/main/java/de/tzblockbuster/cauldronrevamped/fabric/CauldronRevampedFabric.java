@@ -18,5 +18,7 @@ public final class CauldronRevampedFabric implements ModInitializer {
         CauldronRevampedRegistry.register();
 
         CauldronRevampedBlockEntityRegistry.register();
+
+        CauldronRevamped.lateInit();
     }
 }

@@ -6,21 +6,26 @@ import dev.architectury.registry.registries.RegistrarManager;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.alchemy.Potion;
+import oshi.util.tuples.Triplet;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class CRPotion {
 
-    private static final Registrar<Potion> potionRegistrar = RegistrarManager.get(CauldronRevamped.MOD_ID).get(Registries.POTION);
+    public static ArrayList<Triplet<String, Potion, Consumer<Holder<Potion>>>> potions = new ArrayList<>();
 
     public static Holder<Potion> MIXED_POTION;
 
-    public static void register() {
-        MIXED_POTION = registerPotion("mixed_potion", new Potion("mixed_potion"));
+    static {
+        registerPotion("mixed_potion", new Potion("mixed_potion"), potion -> MIXED_POTION = potion);
     }
 
-    private static Holder<Potion> registerPotion(String potionName, Potion potion) {
-        Identifier id = Identifier.fromNamespaceAndPath(CauldronRevamped.MOD_ID, potionName);
-        potionRegistrar.register(id, () -> potion);
-        return potionRegistrar.getHolder(id);
+    private static void registerPotion(String potionName, Potion potion, Consumer<Holder<Potion>> potionConsumer) {
+        potions.add(new Triplet<>(potionName, potion, potionConsumer));
     }
 }

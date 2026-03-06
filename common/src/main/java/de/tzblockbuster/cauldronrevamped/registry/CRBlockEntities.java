@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class CRBlockEntities {
@@ -20,12 +20,12 @@ public class CRBlockEntities {
 
 
     public static <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String name, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier, Block... blocks) {
-        blockEntitySuppliers.add(new BlockEntityRegistration<>(name, blockEntitySupplier, List.of(blocks)));
+        blockEntitySuppliers.add(new BlockEntityRegistration<>(name, blockEntitySupplier, Set.of(blocks)));
         return () -> BuiltInRegistries.BLOCK_ENTITY_TYPE.get(Identifier.fromNamespaceAndPath(CauldronRevamped.MOD_ID, name)).map(blockEntityTypeReference -> (BlockEntityType<T>) blockEntityTypeReference.value()).orElse(null);
     }
 
 
-    public record BlockEntityRegistration<T extends BlockEntity>(String name, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier, List<Block> blocks) {
+    public record BlockEntityRegistration<T extends BlockEntity>(String name, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier, Set<Block> blocks) {
 
     }
 

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "cauldronrevamped:item/slime_bucket"
+  }
+}
