@@ -40,7 +40,7 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
 
     public BrewingCauldronBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(CRBlockEntities.brewingCauldronBlockEntity.get(), blockPos, blockState);
-        if(Platform.getEnvironment() == Env.CLIENT) {
+        if (Platform.getEnvironment() == Env.CLIENT) {
             currentLevel = blockState.getValue(LayeredCauldronBlock.LEVEL);
         }
     }
@@ -211,14 +211,7 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
 
     public void tick() {
         if (getLevel() == null) return;
-        if (Platform.getEnvironment() == Env.SERVER) {
-            int level = getBlockState().getValue(LayeredCauldronBlock.LEVEL);
-            if (getBlockState().getValue(BrewingCauldron.HEATED)) {
-                if (getLevel().random.nextInt(20) == 0) {
-                    getLevel().addParticle(ParticleTypes.BUBBLE_COLUMN_UP, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.6 + level * 3f, getBlockPos().getZ() + 0.5, 0, 0.1, 0);
-                }
-            }
-        } else if (Platform.getEnvironment() == Env.CLIENT) {
+        if (Platform.getEnvironment() == Env.CLIENT) {
             if (getLevel() != null) {
                 int level = getBlockState().getValue(LayeredCauldronBlock.LEVEL);
                 int direction = currentLevel < level ? 1 : currentLevel > level ? -1 : 0;
