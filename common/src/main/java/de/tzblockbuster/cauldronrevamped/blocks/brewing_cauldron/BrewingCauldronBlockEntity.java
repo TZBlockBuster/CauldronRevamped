@@ -282,7 +282,6 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
                 brewingTime = 0;
                 return;
             }
-            LogUtils.getLogger().info("Brewing potion with ingredient: {}", ingredient.get());
             brewingTime--;
             if (!getLevel().getBlockState(getBlockPos()).getValue(BrewingCauldron.BREWING)) {
                 getLevel().setBlockAndUpdate(getBlockPos(), getLevel().getBlockState(getBlockPos()).setValue(BrewingCauldron.BREWING, true));

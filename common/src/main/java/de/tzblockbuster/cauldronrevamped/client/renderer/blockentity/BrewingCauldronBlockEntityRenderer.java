@@ -39,7 +39,6 @@ public class BrewingCauldronBlockEntityRenderer implements BlockEntityRenderer<B
     public void extractRenderState(BrewingCauldronBlockEntity blockEntity, BrewingCauldronRenderState blockEntityRenderState, float f, @NonNull Vec3 vec3, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderer.super.extractRenderState(blockEntity, blockEntityRenderState, f, vec3, crumblingOverlay);
         blockEntityRenderState.modelState = new BrewingCauldronContentModel.BrewingCauldronContentModelState(blockEntity.getFluidAnimationLevel(f), blockEntityRenderState.blockState.getValue(BrewingCauldron.BREWING) ? magicEffect() : blockEntity.getColor(blockEntity.potionFractions));
-        LogUtils.getLogger().info("Potion Fractions: {}", blockEntity.potionFractions);
     }
 
     @Override
