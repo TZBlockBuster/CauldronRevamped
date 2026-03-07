@@ -155,7 +155,8 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
     }
 
     public int getColor(ArrayList<MobEffectInstance> effectInstances) {
-        if (effectInstances.isEmpty()) return 0x0000ff;
+        if (getLevel() == null) return 0x3F76E4;
+        if (effectInstances.isEmpty()) return getLevel().getBiome(getBlockPos()).value().getWaterColor();
         List<ColorMix> colors = new ArrayList<>();
         int totalDuration = effectInstances.stream().mapToInt(MobEffectInstance::getDuration).sum();
         for (MobEffectInstance effect : effectInstances) {
@@ -169,7 +170,7 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
                 });
             }
         }
-        if (colors.isEmpty()) return 0x0000ff;
+        if (colors.isEmpty()) return getLevel().getBiome(getBlockPos()).value().getWaterColor();
         float r = 0, g = 0, b = 0;
         for (ColorMix color : colors) {
             r += (int) (color.r * color.ratio);
