@@ -1,15 +1,12 @@
 package de.tzblockbuster.cauldronrevamped.cauldron;
 
 
-import de.tzblockbuster.cauldronrevamped.CauldronRevamped;
 import de.tzblockbuster.cauldronrevamped.blocks.brewing_cauldron.BrewingCauldron;
 import de.tzblockbuster.cauldronrevamped.blocks.brewing_cauldron.BrewingCauldronBlockEntity;
-import de.tzblockbuster.cauldronrevamped.mixin.CauldronInteractionMixin;
 import de.tzblockbuster.cauldronrevamped.registry.CRBlocks;
 import de.tzblockbuster.cauldronrevamped.registry.CRItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -34,6 +31,7 @@ import java.util.Map;
 public class CauldronRevampedInteraction {
     public static CauldronInteraction.InteractionMap SLIME;
     public static CauldronInteraction.InteractionMap HONEY;
+    public static CauldronInteraction.InteractionMap MILK;
     public static CauldronInteraction.InteractionMap BREWING;
 
 
@@ -72,6 +70,19 @@ public class CauldronRevampedInteraction {
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(item));
                 level.setBlockAndUpdate(blockPos, CRBlocks.HONEY_CAULDRON.defaultBlockState());
+                level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+                level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
+            }
+
+            return InteractionResult.SUCCESS;
+        });
+        empty.put(CRItems.MILK_BOTTLE, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            if (!level.isClientSide()) {
+                Item item = itemStack.getItem();
+                player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
+                player.awardStat(Stats.USE_CAULDRON);
+                player.awardStat(Stats.ITEM_USED.get(item));
+                level.setBlockAndUpdate(blockPos, CRBlocks.MILK_CAULDRON.defaultBlockState());
                 level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                 level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
             }
@@ -275,12 +286,70 @@ public class CauldronRevampedInteraction {
             }
         });
         addDefaultInteractions(brewing);
+
+        Map<Item, CauldronInteraction> milk = CauldronRevampedInteraction.MILK.map();
+        milk.put(Items.BUCKET, (blockState, level, blockPos, player, interactionHand, itemStack) -> CauldronInteraction.fillBucket(
+                blockState,
+                level,
+                blockPos,
+                player,
+                interactionHand,
+                itemStack,
+                new ItemStack(Items.MILK_BUCKET),
+                blockStatex -> blockStatex.getValue(LayeredCauldronBlock.LEVEL) == 3,
+                SoundEvents.BUCKET_FILL
+        ));
+        milk.put(Items.GLASS_BOTTLE, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            if (!level.isClientSide()) {
+                Item item = itemStack.getItem();
+                player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(CRItems.MILK_BOTTLE)));
+                player.awardStat(Stats.USE_CAULDRON);
+                player.awardStat(Stats.ITEM_USED.get(item));
+                LayeredCauldronBlock.lowerFillLevel(blockState, level, blockPos);
+                level.playSound(null, blockPos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+                level.gameEvent(null, GameEvent.FLUID_PICKUP, blockPos);
+            }
+
+            return InteractionResult.SUCCESS;
+        });
+        milk.put(CRItems.MILK_BOTTLE, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            if (blockState.getValue(LayeredCauldronBlock.LEVEL) == 3) {
+                return InteractionResult.TRY_WITH_EMPTY_HAND;
+            } else {
+                if (!level.isClientSide()) {
+                    player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
+                    player.awardStat(Stats.USE_CAULDRON);
+                    player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
+                    level.setBlockAndUpdate(blockPos, blockState.cycle(LayeredCauldronBlock.LEVEL));
+                    level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
+                }
+
+                return InteractionResult.SUCCESS;
+            }
+        });
+        addDefaultInteractions(milk);
     }
 
     public static void addDefaultInteractions(Map<Item, CauldronInteraction> map) {
         CauldronInteraction.addDefaultInteractions(map);
         map.put(CRItems.SLIME_BUCKET, CauldronRevampedInteraction::fillSlimeInteraction);
         map.put(CRItems.HONEY_BUCKET, CauldronRevampedInteraction::fillHoneyInteraction);
+        map.put(Items.MILK_BUCKET, CauldronRevampedInteraction::fillMilkInteraction);
+    }
+
+    public static InteractionResult fillMilkInteraction(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, ItemStack itemStack) {
+        return isUnderWater(level, blockPos)
+                ? InteractionResult.CONSUME
+                : CauldronInteraction.emptyBucket(
+                level,
+                blockPos,
+                player,
+                interactionHand,
+                itemStack,
+                CRBlocks.MILK_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3),
+                SoundEvents.BUCKET_EMPTY
+        );
     }
 
     public static InteractionResult fillSlimeInteraction(

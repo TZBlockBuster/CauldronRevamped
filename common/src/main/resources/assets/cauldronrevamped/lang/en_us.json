@@ -1,8 +1,9 @@
 {
-  "item.minecraft.potion.effect.mixed_potion": "Mixed Potion",
-  "item.cauldronrevamped.lava_bottle": "Lava Bottle",
   "item.cauldronrevamped.honey_bucket": "Honey Bucket",
-  "item.cauldronrevamped.slime_bucket": "Slime Bucket",
+  "item.cauldronrevamped.lava_bottle": "Lava Bottle",
+  "item.cauldronrevamped.milk_bottle": "Milk Bottle",
   "item.cauldronrevamped.slime_bottle": "Slime Bottle",
+  "item.cauldronrevamped.slime_bucket": "Slime Bucket",
+  "item.minecraft.potion.effect.mixed_potion": "Mixed Potion",
   "itemGroup.cauldronrevamped": "Cauldron Revamped"
 }

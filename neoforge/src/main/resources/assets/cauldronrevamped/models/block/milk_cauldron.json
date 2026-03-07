@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "cauldronrevamped:block/milk_cauldron"
+  }
+}

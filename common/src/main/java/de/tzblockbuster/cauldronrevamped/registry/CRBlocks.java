@@ -29,6 +29,7 @@ public class CRBlocks {
 
     public static final Block SLIME_CAULDRON = registerBlockWithoutItem("slime_cauldron", properties -> new LayeredCauldronBlock(Biome.Precipitation.NONE, CauldronRevampedInteraction.SLIME, properties), BlockBehaviour.Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(2.0F).noOcclusion());
     public static final Block HONEY_CAULDRON = registerBlockWithoutItem("honey_cauldron", properties -> new LayeredCauldronBlock(Biome.Precipitation.NONE, CauldronRevampedInteraction.HONEY, properties), BlockBehaviour.Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(2.0F).noOcclusion());
+    public static final Block MILK_CAULDRON = registerBlockWithoutItem("milk_cauldron", properties -> new LayeredCauldronBlock(Biome.Precipitation.NONE, CauldronRevampedInteraction.MILK, properties), BlockBehaviour.Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(2.0F).noOcclusion());
     public static final Block BREWING_CAULDRON = registerBlockWithoutItem("brewing_cauldron", properties -> new BrewingCauldron(CauldronRevampedInteraction.BREWING, properties), BlockBehaviour.Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(2.0F).noOcclusion());
 
 

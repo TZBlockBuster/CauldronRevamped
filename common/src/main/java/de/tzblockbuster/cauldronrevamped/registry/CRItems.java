@@ -1,6 +1,7 @@
 package de.tzblockbuster.cauldronrevamped.registry;
 
 import de.tzblockbuster.cauldronrevamped.CauldronRevamped;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -9,6 +10,7 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SolidBucketItem;
+import net.minecraft.world.item.component.Consumables;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
@@ -39,6 +41,11 @@ public class CRItems {
             "honey_bucket",
             properties -> new SolidBucketItem(Blocks.HONEY_BLOCK, SoundEvents.BUCKET_EMPTY_POWDER_SNOW, properties),
             new Item.Properties().stacksTo(1)
+    );
+
+    public static final Item MILK_BOTTLE = registerItem(
+            "milk_bottle",
+            new Item.Properties().craftRemainder(Items.GLASS_BOTTLE).component(DataComponents.CONSUMABLE, Consumables.MILK_BUCKET).usingConvertsTo(Items.GLASS_BOTTLE).stacksTo(16)
     );
 
     private static Item registerItem(String name, Function<Item.Properties, Item> itemFunction, Item.Properties properties) {

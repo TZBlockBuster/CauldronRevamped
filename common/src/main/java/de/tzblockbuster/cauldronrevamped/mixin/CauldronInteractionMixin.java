@@ -7,65 +7,38 @@ import de.tzblockbuster.cauldronrevamped.cauldron.CauldronRevampedInteraction;
 import de.tzblockbuster.cauldronrevamped.registry.CRBlocks;
 import de.tzblockbuster.cauldronrevamped.registry.CRItems;
 import dev.architectury.injectables.annotations.PlatformOnly;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
-import java.util.function.Predicate;
 
 @Mixin(CauldronInteraction.class)
 public interface CauldronInteractionMixin {
 
     @Shadow
-    private static boolean isUnderWater(Level arg, BlockPos arg2) {
-        return false;
-    }
-
-    @Shadow
-    static InteractionResult emptyBucket(Level arg, BlockPos arg2, Player arg3, InteractionHand arg4, ItemStack arg5, BlockState arg6, SoundEvent arg7) {
-        return null;
-    }
-
-    @Shadow
     static CauldronInteraction.InteractionMap newInteractionMap(String string) {
         return null;
-    }
-
-    @Shadow
-    static InteractionResult fillBucket(BlockState arg, Level arg2, BlockPos arg3, Player arg4, InteractionHand arg5, ItemStack arg6, ItemStack arg7, Predicate<BlockState> predicate, SoundEvent arg8) {
-        return null;
-    }
-
-    @Shadow
-    static void addDefaultInteractions(Map<Item, CauldronInteraction> map) {
-
     }
 
     /// This method registers the interaction maps for the slime and honey cauldrons, which are used to store the interactions for those cauldrons. We have to do this in a mixin because the original class initializes these maps in a static initializer, which we cannot modify directly.
@@ -73,6 +46,7 @@ public interface CauldronInteractionMixin {
     private static void init(CallbackInfo ci) {
         CauldronRevampedInteraction.SLIME = newInteractionMap("SLIME");
         CauldronRevampedInteraction.HONEY = newInteractionMap("HONEY");
+        CauldronRevampedInteraction.MILK = newInteractionMap("MILK");
         CauldronRevampedInteraction.BREWING = newInteractionMap("BREWING");
     }
 
@@ -129,6 +103,7 @@ public interface CauldronInteractionMixin {
     private static void cauldronrevamped$addDefaultInteractions(Map<Item, CauldronInteraction> map, CallbackInfo ci) {
         map.put(CRItems.SLIME_BUCKET, CauldronRevampedInteraction::fillSlimeInteraction);
         map.put(CRItems.HONEY_BUCKET, CauldronRevampedInteraction::fillHoneyInteraction);
+        map.put(Items.MILK_BUCKET, CauldronRevampedInteraction::fillMilkInteraction);
     }
 
 }

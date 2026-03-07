@@ -1,8 +1,9 @@
 {
-  "item.minecraft.potion.effect.mixed_potion": "Gemischter Trank",
-  "item.cauldronrevamped.lava_bottle": "Lavaflasche",
   "item.cauldronrevamped.honey_bucket": "Honigeimer",
-  "item.cauldronrevamped.slime_bucket": "Schleimeimer",
+  "item.cauldronrevamped.lava_bottle": "Lavaflasche",
+  "item.cauldronrevamped.milk_bottle": "Milchflasche",
   "item.cauldronrevamped.slime_bottle": "Schleimflasche",
+  "item.cauldronrevamped.slime_bucket": "Schleimeimer",
+  "item.minecraft.potion.effect.mixed_potion": "Gemischter Trank",
   "itemGroup.cauldronrevamped": "Cauldron Revamped"
 }

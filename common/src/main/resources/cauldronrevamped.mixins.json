@@ -6,12 +6,14 @@
   "client": [
   ],
   "mixins": [
+    "AbstractCowMixin",
     "BlocksMixin",
     "BottleItemMixin",
     "CauldronInteractionMixin",
     "HoneyBlockMixin",
     "LayeredCauldronBlockMixin",
-    "SlimeBlockMixin"
+    "SlimeBlockMixin",
+    "WanderingTraderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
