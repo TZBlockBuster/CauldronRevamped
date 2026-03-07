@@ -1,6 +1,7 @@
 package de.tzblockbuster.cauldronrevamped.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import de.tzblockbuster.cauldronrevamped.blocks.brewing_cauldron.BrewingCauldron;
 import de.tzblockbuster.cauldronrevamped.blocks.brewing_cauldron.BrewingCauldronBlockEntity;
 import de.tzblockbuster.cauldronrevamped.cauldron.CauldronRevampedInteraction;
 import de.tzblockbuster.cauldronrevamped.registry.CRBlocks;
@@ -13,6 +14,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -109,7 +111,7 @@ public interface CauldronInteractionMixin {
                         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
                         player.awardStat(Stats.USE_CAULDRON);
                         player.awardStat(Stats.ITEM_USED.get(item));
-                        level.setBlockAndUpdate(blockPos, CRBlocks.BREWING_CAULDRON.defaultBlockState());
+                        level.setBlockAndUpdate(blockPos, CRBlocks.BREWING_CAULDRON.defaultBlockState().setValue(BrewingCauldron.HEATED, level.getBlockState(blockPos.below()).is(BlockTags.CAMPFIRES)));
                         level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                         level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
                     }
