@@ -2,6 +2,7 @@ package de.tzblockbuster.cauldronrevamped.client.renderer.blockentity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
+import de.tzblockbuster.cauldronrevamped.blocks.brewing_cauldron.BrewingCauldron;
 import de.tzblockbuster.cauldronrevamped.blocks.brewing_cauldron.BrewingCauldronBlockEntity;
 import de.tzblockbuster.cauldronrevamped.client.models.BrewingCauldronContentModel;
 import de.tzblockbuster.cauldronrevamped.client.render_state.blockentity.BrewingCauldronRenderState;
@@ -37,7 +38,8 @@ public class BrewingCauldronBlockEntityRenderer implements BlockEntityRenderer<B
     @Override
     public void extractRenderState(BrewingCauldronBlockEntity blockEntity, BrewingCauldronRenderState blockEntityRenderState, float f, @NonNull Vec3 vec3, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderer.super.extractRenderState(blockEntity, blockEntityRenderState, f, vec3, crumblingOverlay);
-        blockEntityRenderState.modelState = new BrewingCauldronContentModel.BrewingCauldronContentModelState(blockEntity.getFluidAnimationLevel(f), blockEntity.getColor(blockEntity.effects));
+        blockEntityRenderState.modelState = new BrewingCauldronContentModel.BrewingCauldronContentModelState(blockEntity.getFluidAnimationLevel(f), blockEntityRenderState.blockState.getValue(BrewingCauldron.BREWING) ? magicEffect() : blockEntity.getColor(blockEntity.potionFractions));
+        LogUtils.getLogger().info("Potion Fractions: {}", blockEntity.potionFractions);
     }
 
     @Override

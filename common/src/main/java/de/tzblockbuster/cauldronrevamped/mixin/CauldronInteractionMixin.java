@@ -19,7 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -62,36 +61,23 @@ public interface CauldronInteractionMixin {
         map.put(Items.POTION, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             PotionContents potionContents = itemStack.get(DataComponents.POTION_CONTENTS);
             if (potionContents != null) {
-                if (potionContents.is(Potions.WATER)) {
-                    if (!level.isClientSide()) {
-                        Item item = itemStack.getItem();
-                        player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
-                        player.awardStat(Stats.USE_CAULDRON);
-                        player.awardStat(Stats.ITEM_USED.get(item));
-                        level.setBlockAndUpdate(blockPos, Blocks.WATER_CAULDRON.defaultBlockState());
-                        level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
-                        level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
-                    }
-                    return InteractionResult.SUCCESS;
-                } else {
-                    level.setBlockAndUpdate(blockPos, CRBlocks.BREWING_CAULDRON.defaultBlockState());
+                level.setBlockAndUpdate(blockPos, CRBlocks.BREWING_CAULDRON.defaultBlockState());
 
-                    BrewingCauldronBlockEntity brewingCauldronBlockEntity = (BrewingCauldronBlockEntity) level.getBlockEntity(blockPos);
-                    if (brewingCauldronBlockEntity == null) return InteractionResult.TRY_WITH_EMPTY_HAND;
-                    if (!brewingCauldronBlockEntity.addPotion(itemStack)) return InteractionResult.TRY_WITH_EMPTY_HAND;
+                BrewingCauldronBlockEntity brewingCauldronBlockEntity = (BrewingCauldronBlockEntity) level.getBlockEntity(blockPos);
+                if (brewingCauldronBlockEntity == null) return InteractionResult.TRY_WITH_EMPTY_HAND;
+                if (!brewingCauldronBlockEntity.addPotion(itemStack)) return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-                    if (!level.isClientSide()) {
-                        Item item = itemStack.getItem();
-                        player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
-                        player.awardStat(Stats.USE_CAULDRON);
-                        player.awardStat(Stats.ITEM_USED.get(item));
-                        level.setBlockAndUpdate(blockPos, CRBlocks.BREWING_CAULDRON.defaultBlockState().setValue(BrewingCauldron.HEATED, level.getBlockState(blockPos.below()).is(BlockTags.CAMPFIRES)));
-                        level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
-                        level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
-                    }
-
-                    return InteractionResult.SUCCESS;
+                if (!level.isClientSide()) {
+                    Item item = itemStack.getItem();
+                    player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
+                    player.awardStat(Stats.USE_CAULDRON);
+                    player.awardStat(Stats.ITEM_USED.get(item));
+                    level.setBlockAndUpdate(blockPos, CRBlocks.BREWING_CAULDRON.defaultBlockState().setValue(BrewingCauldron.HEATED, level.getBlockState(blockPos.below()).is(BlockTags.CAMPFIRES)));
+                    level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
                 }
+
+                return InteractionResult.SUCCESS;
             } else {
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
             }

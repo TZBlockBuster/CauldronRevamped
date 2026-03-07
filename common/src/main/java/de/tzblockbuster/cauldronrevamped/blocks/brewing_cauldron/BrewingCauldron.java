@@ -11,7 +11,9 @@ import net.minecraft.util.Util;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -46,12 +48,14 @@ public class BrewingCauldron extends AbstractCauldronBlock implements EntityBloc
     );
 
     public static final BooleanProperty HEATED = BooleanProperty.create("heated");
+    public static final BooleanProperty BREWING = BooleanProperty.create("brewing");
 
     public BrewingCauldron(CauldronInteraction.InteractionMap interactionMap, BlockBehaviour.Properties properties) {
         super(properties, interactionMap);
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(HEATED, false)
                 .setValue(LayeredCauldronBlock.LEVEL, 1)
+                .setValue(BREWING, false)
         );
     }
 
@@ -68,6 +72,7 @@ public class BrewingCauldron extends AbstractCauldronBlock implements EntityBloc
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(HEATED);
         builder.add(LayeredCauldronBlock.LEVEL);
+        builder.add(BREWING);
     }
 
     @Override
@@ -107,9 +112,21 @@ public class BrewingCauldron extends AbstractCauldronBlock implements EntityBloc
         BrewingCauldronBlockEntity blockEntity = (BrewingCauldronBlockEntity) level.getBlockEntity(blockPos);
         if (blockEntity == null) return;
         if (entity instanceof Player player) {
-            if (!blockEntity.effects.stream().allMatch(effect -> player.hasEffect(effect.getEffect()))) {
-                blockEntity.getEffectsForNextPotion().forEach(effect -> player.addEffect(new MobEffectInstance(effect.getEffect(), effect.getDuration(), effect.getAmplifier())));
+            if (!blockEntity.potionFractions.stream().flatMap(f -> f.potion().value().getEffects().stream()).allMatch(effect -> player.hasEffect(effect.getEffect()))) {
+                blockEntity.getEffectsForNextPotion().stream().flatMap(f -> f.potion().value().getEffects().stream()).forEach(effect -> player.addEffect(new MobEffectInstance(effect.getEffect(), effect.getDuration(), effect.getAmplifier())));
                 lowerFillLevel(blockState, level, blockPos);
+            }
+        } else if (entity instanceof ItemEntity itemEntity) {
+            if (!level.isClientSide()) {
+                ItemStack itemStack = itemEntity.getItem();
+                ItemStack clone = itemStack.copyWithCount(1);
+                if (blockEntity.isValidIngredient(clone) && blockEntity.setIngredient(clone)) {
+                    if (itemStack.getCount() == 1) {
+                        itemEntity.discard();
+                    } else {
+                        itemEntity.setItem(itemStack.copyWithCount(itemStack.getCount() - 1));
+                    }
+                }
             }
         }
     }
