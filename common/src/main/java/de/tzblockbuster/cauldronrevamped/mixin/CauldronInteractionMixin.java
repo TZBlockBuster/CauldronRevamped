@@ -6,6 +6,7 @@ import de.tzblockbuster.cauldronrevamped.blocks.brewing_cauldron.BrewingCauldron
 import de.tzblockbuster.cauldronrevamped.cauldron.CauldronRevampedInteraction;
 import de.tzblockbuster.cauldronrevamped.registry.CRBlocks;
 import de.tzblockbuster.cauldronrevamped.registry.CRItems;
+import de.tzblockbuster.cauldronrevamped.registry.CRPotion;
 import dev.architectury.injectables.annotations.PlatformOnly;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.component.DataComponents;
@@ -60,7 +61,7 @@ public interface CauldronInteractionMixin {
         map.remove(Items.POTION);
         map.put(Items.POTION, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             PotionContents potionContents = itemStack.get(DataComponents.POTION_CONTENTS);
-            if (potionContents != null) {
+            if (potionContents != null && potionContents.potion().isPresent() && potionContents.potion().get() != CRPotion.MIXED_POTION) {
                 level.setBlockAndUpdate(blockPos, CRBlocks.BREWING_CAULDRON.defaultBlockState());
 
                 BrewingCauldronBlockEntity brewingCauldronBlockEntity = (BrewingCauldronBlockEntity) level.getBlockEntity(blockPos);

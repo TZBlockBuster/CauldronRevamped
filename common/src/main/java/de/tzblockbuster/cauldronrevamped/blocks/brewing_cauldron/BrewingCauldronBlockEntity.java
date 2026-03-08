@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import de.tzblockbuster.cauldronrevamped.network.CRNetworkManager;
 import de.tzblockbuster.cauldronrevamped.registry.CRBlockEntities;
 import de.tzblockbuster.cauldronrevamped.registry.CRPotion;
 import dev.architectury.platform.Platform;
@@ -12,14 +13,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -96,7 +95,7 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
         if (getLevel() == null) return false;
         if (getBlockState().getValue(LayeredCauldronBlock.LEVEL) >= 3) return false;
         PotionContents potionContents = stack.get(DataComponents.POTION_CONTENTS);
-        if (potionContents == null || potionContents.potion().isEmpty()) {
+        if (potionContents == null || potionContents.potion().isEmpty() || potionContents.potion().get() == CRPotion.MIXED_POTION) {
             return false;
         }
         addFraction(new PotionFraction(potionContents.potion().get(), 1f));
@@ -114,6 +113,7 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
         } else {
             potionFractions.add(fraction);
         }
+        UpdateBlock();
     }
 
     public void removeFraction(PotionFraction fraction) {
@@ -126,6 +126,7 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
                 potionFractions.add(new PotionFraction(fractionToRemove.potion(), newFraction));
             }
         }
+        UpdateBlock();
     }
 
     public ItemStack takePotion() {
@@ -141,26 +142,11 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
         int level = getBlockState().getValue(LayeredCauldronBlock.LEVEL);
         float factor = 1f / level;
 
-
         ArrayList<PotionFraction> takeFractions = new ArrayList<>();
-        ArrayList<PotionFraction> potionFractionInstances = this.potionFractions;
-        ArrayList<Integer> effectsToRemove = new ArrayList<>();
-
-
-        for (int i = 0; i < potionFractionInstances.size(); i++) {
-            PotionFraction fraction = potionFractionInstances.get(i);
-            // Prevent small effects to remain in the cauldron
-            if (fraction.fraction() * (1 - factor) < 0.01) {
-                effectsToRemove.add(i);
-                takeFractions.add(fraction);
-                continue;
-            }
-            potionFractionInstances.set(i, new PotionFraction(fraction.potion(), fraction.fraction() * (1 - factor)));
-            takeFractions.add(new PotionFraction(fraction.potion(), fraction.fraction() * factor));
-        }
-
-        for (Integer index : effectsToRemove.reversed()) {
-            potionFractionInstances.remove((int) index);
+        for (PotionFraction fraction : potionFractions.stream().toList()) {
+            PotionFraction fractionToTake = new PotionFraction(fraction.potion(), fraction.fraction() * factor);
+            removeFraction(fractionToTake);
+            takeFractions.add(fractionToTake);
         }
 
         return takeFractions;
@@ -283,6 +269,7 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
                 return;
             }
             brewingTime--;
+            UpdateBlock();
             if (!getLevel().getBlockState(getBlockPos()).getValue(BrewingCauldron.BREWING)) {
                 getLevel().setBlockAndUpdate(getBlockPos(), getLevel().getBlockState(getBlockPos()).setValue(BrewingCauldron.BREWING, true));
             }
@@ -306,6 +293,10 @@ public class BrewingCauldronBlockEntity extends BlockEntity {
         } else if (getLevel().getBlockState(getBlockPos()).getValue(BrewingCauldron.BREWING)) {
             getLevel().setBlockAndUpdate(getBlockPos(), getLevel().getBlockState(getBlockPos()).setValue(BrewingCauldron.BREWING, false));
         }
+    }
+
+    public void UpdateBlock() {
+        CRNetworkManager.sendBrewingCauldronSyncPacket(this);
     }
 
     public record PotionFraction(Holder<Potion> potion, float fraction) {

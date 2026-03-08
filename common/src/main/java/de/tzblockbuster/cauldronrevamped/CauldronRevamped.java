@@ -3,6 +3,7 @@ package de.tzblockbuster.cauldronrevamped;
 import de.tzblockbuster.cauldronrevamped.cauldron.CauldronRevampedInteraction;
 import de.tzblockbuster.cauldronrevamped.client.registry.CRModelLayerLocation;
 import de.tzblockbuster.cauldronrevamped.dispenser.CRDispenseItemBehavior;
+import de.tzblockbuster.cauldronrevamped.network.CRNetworkManager;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
 
@@ -13,6 +14,7 @@ public final class CauldronRevamped {
         if (Platform.getEnvironment() == Env.CLIENT) {
             CRModelLayerLocation.register();
         }
+        CRNetworkManager.register();
     }
 
     public static void lateInit() {

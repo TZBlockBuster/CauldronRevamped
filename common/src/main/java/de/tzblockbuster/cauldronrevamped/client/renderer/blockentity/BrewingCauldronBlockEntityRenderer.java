@@ -15,10 +15,17 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
 
 public class BrewingCauldronBlockEntityRenderer implements BlockEntityRenderer<BrewingCauldronBlockEntity, BrewingCauldronRenderState> {
 
@@ -39,11 +46,21 @@ public class BrewingCauldronBlockEntityRenderer implements BlockEntityRenderer<B
     public void extractRenderState(BrewingCauldronBlockEntity blockEntity, BrewingCauldronRenderState blockEntityRenderState, float f, @NonNull Vec3 vec3, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderer.super.extractRenderState(blockEntity, blockEntityRenderState, f, vec3, crumblingOverlay);
         blockEntityRenderState.modelState = new BrewingCauldronContentModel.BrewingCauldronContentModelState(blockEntity.getFluidAnimationLevel(f), blockEntityRenderState.blockState.getValue(BrewingCauldron.BREWING) ? magicEffect() : blockEntity.getColor(blockEntity.potionFractions));
+        blockEntityRenderState.brewingTime = blockEntity.brewingTime;
+        blockEntityRenderState.potionFractions = blockEntity.potionFractions;
+        blockEntityRenderState.isSneaking = Minecraft.getInstance().options.keyShift.isDown();
     }
 
     @Override
     public void submit(BrewingCauldronRenderState blockEntityRenderState, @NonNull PoseStack poseStack, @NonNull SubmitNodeCollector submitNodeCollector, @NonNull CameraRenderState cameraRenderState) {
         submitNodeCollector.submitModel(contentModel, blockEntityRenderState.modelState, poseStack, Sheets.translucentBlockItemSheet(), blockEntityRenderState.lightCoords, OverlayTexture.NO_OVERLAY, convertColorRgbToArgb(blockEntityRenderState.modelState.color()), waterStill, 0, blockEntityRenderState.breakProgress);
+        if (blockEntityRenderState.isSneaking) {
+            ArrayList<Component> tooltips = blockEntityRenderState.getTooltips();
+            for (int i = 0; i < tooltips.size(); i++) {
+                Component component = tooltips.get(i);
+                submitNodeCollector.submitNameTag(poseStack, new Vec3(0.5, 1.1 + 0.25 * tooltips.size(), 0.5), (blockEntityRenderState.getTooltips().size() - i) * (Minecraft.getInstance().font.lineHeight + 3), component, true, blockEntityRenderState.lightCoords, cameraRenderState.blockPos.getCenter().distanceToSqr(blockEntityRenderState.blockPos.getCenter()), cameraRenderState);
+            }
+        }
     }
 
     public int computeColor(int red, int green, int blue) {
