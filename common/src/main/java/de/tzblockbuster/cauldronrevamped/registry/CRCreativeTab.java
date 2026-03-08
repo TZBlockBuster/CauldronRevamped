@@ -15,7 +15,7 @@ public class CRCreativeTab {
 
     static {
         creativeTabs.add(new Tuple<>("cauldronrevamped", new CreativeTab(new ItemStack(Items.CAULDRON), Component.translatable("itemGroup.cauldronrevamped"))
-                .addItems(CRItems.SLIME_BUCKET, CRItems.HONEY_BUCKET, CRItems.SLIME_BOTTLE, CRItems.LAVA_BOTTLE)
+                .addItems(CRItems.SLIME_BUCKET, CRItems.HONEY_BUCKET, CRItems.SLIME_BOTTLE, CRItems.LAVA_BOTTLE, CRItems.MILK_BOTTLE)
         ));
     }
 
