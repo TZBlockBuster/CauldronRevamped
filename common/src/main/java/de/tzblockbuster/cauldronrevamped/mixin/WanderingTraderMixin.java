@@ -1,9 +1,11 @@
 package de.tzblockbuster.cauldronrevamped.mixin;
 
 import de.tzblockbuster.cauldronrevamped.registry.CRItems;
+import dev.architectury.injectables.annotations.PlatformOnly;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.UseItemGoal;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.npc.wanderingtrader.WanderingTrader;
@@ -11,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -21,8 +24,7 @@ import java.util.function.Predicate;
 @Mixin(WanderingTrader.class)
 public abstract class WanderingTraderMixin extends AbstractVillager {
 
-
-    public WanderingTraderMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
+    public WanderingTraderMixin(EntityType<? extends WanderingTrader> entityType, Level level) {
         super(entityType, level);
     }
 
@@ -34,7 +36,7 @@ public abstract class WanderingTraderMixin extends AbstractVillager {
     @Inject(method = "registerGoals", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/goal/GoalSelector;addGoal(ILnet/minecraft/world/entity/ai/goal/Goal;)V", ordinal = 2, shift = At.Shift.AFTER))
     private void cauldronrevamped$wanderingTrader$registerGoals$inject(CallbackInfo ci) {
         this.goalSelector.addGoal(0, new UseItemGoal<>(
-                this,
+                (WanderingTrader) (Object) this,
                 new ItemStack(CRItems.MILK_BOTTLE),
                 SoundEvents.WANDERING_TRADER_REAPPEARED,
                 wanderingTrader -> ((wanderingTrader.level().isClientSide() || ((ServerLevel)wanderingTrader.level()).getDayCount() % 2 == 1)) && this.level().isBrightOutside() && wanderingTrader.isInvisible()
